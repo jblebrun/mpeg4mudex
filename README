@@ -1,0 +1,25 @@
+This is a simple command-line program that modifies the box (atom) structure of
+an .m4a (MPEG-4) file while ensuring that it's still a valid file. The tool
+removes all "meta" boxes from the file, and updates the size of any enclosing
+boxes, as well as any offsets that are based on the absolute file size.
+
+To use the file, specify the name of an input file, and the name of the desired
+output file. There are no other options.
+
+The tool will show you the original tree structure, but only shows the portions
+of the tree that are relavant to the changes. Container boxes which have a
+substructure that will not contain "meta" boxes or boxes tracking offsets will
+not be shown in detail.
+
+Then, the tool will modify the box tree, removing all "meta" boxes, and updating
+any relevant offsets. The modified tree is displayed for visual verification,
+and then it is written out to the provided output file name using MPEG-4 layout.
+
+This simple tool does not support large containers that might contain boxes
+larger than 2^32 bytes, or chunk offsets large than 2^32. However, it could be
+trivially modified to support such files.
+
+For a quick example, just run 
+
+make test
+
