@@ -123,11 +123,9 @@ int find_meta(FILE *m4a_file) {
         checksum <<= 8;
         checksum |= c;
         if(checksum == target_checksum) {
-            printf("Found 'meta' at position %lu\n", index - strlen(target));
             return index;
         }
     }
-    printf("found no meta box in all %d positions\n",index);
     return -1; 
 }
 
@@ -213,6 +211,8 @@ void adjust_stco_offset(atom_t *stco, int offset_adjust) {
 //Strip meta boxes, returning the size of
 //meta tags before mdat boxes for later
 //adjustment.
+//It adds up all meta box sizes occurring before mdat, and returns them in accumulator
+//That value can subsequently be used to adjust other chunk offsets.
 void strip_meta_box_rec(atom_t *node, bool do_accumulate, uint32_t &accumulator, atom_t **stco) {
     uint32_t i;
     if(strncmp(node->name, "mdat", 4) == 0) {
@@ -222,8 +222,14 @@ void strip_meta_box_rec(atom_t *node, bool do_accumulate, uint32_t &accumulator,
     } else if(do_accumulate && strncmp(node->name, "meta", 4) == 0) {
         accumulator += node->len;
         node->active = false;
-    } 
 
+        //Fix up this meta box's parent box sizes
+        atom_t *cur = node->parent;
+        while(cur != NULL)  {
+            cur->len -= node->len;
+            cur = cur->parent;
+        }
+    } 
     for(i = 0; i < node->children.size(); i++) {
         strip_meta_box_rec(node->children[i], do_accumulate, accumulator, stco);
     }
@@ -297,6 +303,7 @@ atom_t* build_tree(FILE* m4a_file) {
 int main(int argc, char** argv) {
     FILE *m4a_file;
     FILE *out_file;
+    int meta_idx = 0;
    
     //Check inputs, open file, check for success
     if(argc < 3) {
@@ -311,7 +318,11 @@ int main(int argc, char** argv) {
 
     //Quick sanity check on input file
     printf("\nChecking to see if source file has a meta box: \n");
-    find_meta(m4a_file);
+    if((meta_idx = find_meta(m4a_file)) >= 0) {
+        printf("Found a meta box at %d\n",meta_idx);
+    } else {
+        printf("No meta box found.\n");
+    }
     rewind(m4a_file); 
 
     //Build the tree
@@ -338,7 +349,11 @@ int main(int argc, char** argv) {
     //Verify the output file
     printf("\nVerifying that output file has no meta box: \n");
     out_file = fopen(argv[2], "rb");
-    find_meta(out_file);
+    if((meta_idx = find_meta(out_file)) >= 0) {
+        printf("Found a meta box at %d\n",meta_idx);
+    } else {
+        printf("No meta box found.\n");
+    }
     
 
 }
