@@ -32,6 +32,9 @@
  *
  * So, based on that information, we track make sure to check the 
  * substructure of the necessary containers. 
+ *
+ * If we were not stripping the meta box, it may have also been necessary to adjust 
+ * values in the 'iloc' and 'dref' sub-boxes of the meta box, not sure.
  */
 const char *const containers_of_interest = "moov|udta|trak|mdia|minf|stbl";
 typedef struct atom_t {
