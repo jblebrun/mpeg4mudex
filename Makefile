@@ -13,6 +13,7 @@ m4mudex.o: m4mudex.cc
 
 test: m4mudex
 	./m4mudex test.m4a test-metaless.m4a
+	open test-metaless.m4a
 
 clean: 
 	$(RM) m4mudex m4mudex.o test-metaless.m4a m4mudex.tar.gz
