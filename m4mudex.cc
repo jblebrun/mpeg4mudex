@@ -138,7 +138,19 @@ void print_tree_rec(atom_t* node, uint8_t level) {
     }
     //skip root content, it's not *really* an atom
     if(node->parent != NULL) { 
-        printf("%u %s\n", node->len, node->name);
+        printf("%u %s", node->len, node->name);
+        if(strncmp(node->name, "stco", 4) == 0) {
+            uint32_t stco_entries = htonl(*((uint32_t*)(node->data + 4)));
+            printf(" (%d entries)", stco_entries);
+            for(i=0; i <= (10 > stco_entries ? stco_entries : 10); i++) {
+                printf(" %d ", htonl(*((uint32_t*)(node->data + 8 + 4*i))));    
+            }
+            if(stco_entries > 10) {
+                printf("...");
+            }
+            
+        }
+        printf("\n");
     }
     for(i=0; i<node->children.size(); i++) {
         if(node->children[i]->active == true) {
