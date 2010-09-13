@@ -136,7 +136,7 @@ int find_meta(FILE *m4a_file) {
  */
 void print_tree_rec(atom_t* node, uint8_t level) {
     uint8_t i;
-    for(i=0; i<level; i++) {
+    for(i=1; i<level; i++) {
         printf(".");
     }
     //skip root content, it's not *really* an atom
@@ -318,7 +318,7 @@ int main(int argc, char** argv) {
     atom_t* m4a_tree = build_tree(m4a_file);
 
     //Show the tree
-    printf("printing original tree:\n");
+    printf("Original tree:\n");
     print_tree(m4a_tree);
     printf("\n");
     
@@ -326,7 +326,7 @@ int main(int argc, char** argv) {
     strip_meta_box(m4a_tree);
 
     //Show the modified tree
-    printf("printing modifiedtree:\n");
+    printf("Modified tree:\n");
     print_tree(m4a_tree);
     printf("\n");
    
